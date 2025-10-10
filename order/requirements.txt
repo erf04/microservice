@@ -1,0 +1,6 @@
+fastapi[standard]
+pymongo
+pydantic[email]
+motor
+grpcio
+protobuf

@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-db-config
+  namespace: default
+data:
+  DB_HOST: mongo
+  DB_PORT: "27017"
+  DB_USER: admin
+  DB_NAME: cluster
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: product-db-secret
+  namespace: default
+type: Opaque
+stringData:
+  DB_PASSWORD: admin123
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+  namespace: default
+  labels:
+    app: product-service
+spec:
+  selector:
+    matchLabels:
+      app: product-service
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      containers:
+      - name: product-service
+        image: product-service:1.0.0   # <-- replace with your product-service image
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 50051
+          name: grpc
+        env:
+          # ConfigMap values
+          - name: DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: product-db-config
+                key: DB_HOST
+          - name: DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: product-db-config
+                key: DB_PORT
+          - name: DB_USER
+            valueFrom:
+              configMapKeyRef:
+                name: product-db-config
+                key: DB_USER
+          - name: DB_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: product-db-config
+                key: DB_NAME
+          # Secret values
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: product-db-secret
+                key: DB_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-service
+spec:
+  selector:
+    app: product-service
+  ports:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051
+    # nodePort: 30082   # different NodePort than order-service
+  type: ClusterIP
