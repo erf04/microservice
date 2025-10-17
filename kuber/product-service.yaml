@@ -96,5 +96,5 @@ spec:
   - protocol: TCP
     port: 50051
     targetPort: 50051
-    # nodePort: 30082   # different NodePort than order-service
-  type: ClusterIP
+    nodePort: 30082   # different NodePort than order-service
+  type: NodePort

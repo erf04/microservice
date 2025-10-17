@@ -113,8 +113,7 @@ spec:
   selector:
     app: order-service
   ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 8000  # same as containerPort
-    nodePort: 30080
-  type: NodePort
+    - protocol: TCP
+      port: 80
+      targetPort: 8000  # same as containerPort
+  type: ClusterIP
