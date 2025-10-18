@@ -20,6 +20,8 @@ async def create_order(order:OrderCreate):
 
 
 
+
+
 @router.put("/update")
 async def update_order(order_detail:OrderUpdate):
     order_updated = await OrderModel.update(order_detail)
