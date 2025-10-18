@@ -39,7 +39,7 @@ async def get_products(name:str = ""):
     return response
 
 
-@router.get("/user/{user_id}",response_model=list[OrderOut])
-async def get_orders_by_user_id(user_id:int):
-    orders = await OrderModel.get_by_user_id(user_id)
-    return orders
+# @router.get("/user/{user_id}",response_model=list[OrderOut])
+# async def get_orders_by_user_id(user_id:int):
+#     orders = await OrderModel.get_by_user_id(user_id)
+#     return orders
