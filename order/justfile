@@ -1,0 +1,28 @@
+set shell := ["cmd.exe", "/C"]
+
+# justfile for order service project
+project_name := "order-service"
+build_dir := "F:/projects/kubernetes-test/order"
+image_name := "erfank04/order-service"
+image_tag := "latest"
+full_image_name := "{{image_name}}:{{image_tag}}"
+kubernetes_manifest := "F:/projects/kubernetes-test/kuber/order-service.yaml"
+container_name := "order-service-container"
+deployment_name := "order-service-deployment"
+namespace := "default"
+
+# run order service locally
+run-local:
+    cd {{build_dir}} && uvicorn main:app --host 0.0.0.0 --port 8000
+
+# docker build order service image
+docker-build:
+    cd {{build_dir}} && docker build -t {{full_image_name}} .
+
+# push order service image to docker registry
+docker-push:
+    docker push {{full_image_name}}
+
+# docker run order service container
+docker-run:
+    docker run -p 8000:8000 --name {{container_name}} --rm {{full_image_name}}

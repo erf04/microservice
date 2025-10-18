@@ -28,7 +28,7 @@ jobs:
   deploy-order:
     needs: detect-changes
     if: needs.detect-changes.outputs.order_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
@@ -64,7 +64,7 @@ jobs:
   deploy-product:
     needs: detect-changes
     if: needs.detect-changes.outputs.product_changed == 'true'
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
