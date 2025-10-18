@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: product-service
-        image: product-service:1.0.0   # <-- replace with your product-service image
+        image: erfank04/product-service:latest   # <-- replace with your product-service image
         resources:
           requests:
             cpu: 100m

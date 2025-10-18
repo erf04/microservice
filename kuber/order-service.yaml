@@ -47,6 +47,8 @@ spec:
         # Init containers are exactly like regular containers, except:
           # - Init containers always run to completion.
           # - Each init container must complete successfully before the next one starts.
+      imagePullSecrets:
+        - name: regcred
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
@@ -60,7 +62,7 @@ spec:
             value: "5"
       containers:
       - name:  order-service
-        image:  order-service:1.0.3
+        image:  erfank04/order-service:latest
         resources:
           requests:
             cpu: 100m

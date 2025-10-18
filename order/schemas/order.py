@@ -15,5 +15,5 @@ class OrderOut(OrderBase):
     id: str
 
 
-class OrderWithProduct(OrderOut):
-    products: list[ProductOut]
+# class OrderWithProduct(OrderOut):
+#     products: list[ProductOut]

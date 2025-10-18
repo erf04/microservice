@@ -1,0 +1,98 @@
+name: CI/CD for Order & Product Services
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  VERSION: v${{ github.run_number }}
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      order_changed: ${{ steps.filter.outputs.order }}
+      product_changed: ${{ steps.filter.outputs.product }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            order:
+              - 'order/**'
+            product:
+              - 'product/**'
+
+  deploy-order:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.order_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Order Service images
+        uses: docker/build-push-action@v6
+        with:
+          context: ./order
+          push: true
+          tags: |
+            ${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }}
+            ${{ secrets.ORDER_IMAGE }}:latest
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" > ~/.kube/config
+
+      - name: Update Order Deployment
+        run: |
+          kubectl set image deployment/order-deployment order-container=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }} --record
+          kubectl rollout status deployment/order-deployment
+          echo "✅ Order service updated to version ${{ env.VERSION }}"
+
+  deploy-product:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.product_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Product Service images
+        uses: docker/build-push-action@v6
+        with:
+          context: ./product
+          push: true
+          tags: |
+            ${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }}
+            ${{ secrets.PRODUCT_IMAGE }}:latest
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" > ~/.kube/config
+
+      - name: Update Product Deployment
+        run: |
+          kubectl set image deployment/product-deployment product-container=${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }} --record
+          kubectl rollout status deployment/product-deployment
+          echo "✅ Product service updated to version ${{ env.VERSION }}"
