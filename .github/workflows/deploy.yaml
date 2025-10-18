@@ -25,10 +25,13 @@ jobs:
             product:
               - 'product/**'
 
-  deploy-order:
-    needs: detect-changes
+  # -----------------------------
+  # Build Order Service
+  # -----------------------------
+  build-order:
+    needs: detect-chchanges
     if: needs.detect-changes.outputs.order_changed == 'true'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -50,6 +53,13 @@ jobs:
             ${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }}
             ${{ secrets.ORDER_IMAGE }}:latest
 
+  # -----------------------------
+  # Deploy Order Service (on VM)
+  # -----------------------------
+  deploy-order:
+    needs: build-order
+    runs-on: self-hosted
+    steps:
       - name: Set up kubeconfig
         run: |
           mkdir -p ~/.kube
@@ -57,14 +67,17 @@ jobs:
 
       - name: Update Order Deployment
         run: |
-          kubectl set image deployment/order-deployment order-container=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }} --record
-          kubectl rollout status deployment/order-deployment
+          kubectl set image deployment/order-service order-service=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }} --record
+          kubectl rollout status deployment/order-service
           echo "✅ Order service updated to version ${{ env.VERSION }}"
 
-  deploy-product:
+  # -----------------------------
+  # Build Product Service
+  # -----------------------------
+  build-product:
     needs: detect-changes
     if: needs.detect-changes.outputs.product_changed == 'true'
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -86,6 +99,13 @@ jobs:
             ${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }}
             ${{ secrets.PRODUCT_IMAGE }}:latest
 
+  # -----------------------------
+  # Deploy Product Service (on VM)
+  # -----------------------------
+  deploy-product:
+    needs: build-product
+    runs-on: self-hosted
+    steps:
       - name: Set up kubeconfig
         run: |
           mkdir -p ~/.kube
@@ -93,6 +113,6 @@ jobs:
 
       - name: Update Product Deployment
         run: |
-          kubectl set image deployment/product-deployment product-container=${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }} --record
-          kubectl rollout status deployment/product-deployment
+          kubectl set image deployment/product-service product-service=${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }} --record
+          kubectl rollout status deployment/product-service
           echo "✅ Product service updated to version ${{ env.VERSION }}"
