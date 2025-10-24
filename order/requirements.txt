@@ -4,3 +4,4 @@ pydantic[email]
 motor
 grpcio
 protobuf
+nats-py

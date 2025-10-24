@@ -14,9 +14,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+import (
+	"product/schema"
+)
+
 type ProductRepository interface {
 	FindByID(ctx context.Context, id string) (*models.Product, error)
-	Find(ctx context.Context, body models.ProductWriteBody) ([]*models.Product, error)
+	Find(ctx context.Context, body schema.GetProductsSchema) ([]*models.Product, error)
 }
 
 type productRepository struct {
@@ -48,7 +52,7 @@ func (r *productRepository) FindByID(ctx context.Context, id string) (*models.Pr
 	return &product, nil
 }
 
-func (r *productRepository) Find(ctx context.Context, body models.ProductWriteBody) ([]*models.Product, error) {
+func (r *productRepository) Find(ctx context.Context, body schema.GetProductsSchema) ([]*models.Product, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()

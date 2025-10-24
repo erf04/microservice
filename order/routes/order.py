@@ -1,11 +1,12 @@
 from fastapi.routing import APIRouter
 from schemas.order import OrderCreate,OrderOut,OrderUpdate
 from models.order import OrderModel
-from grpcsvc.product import get_product_by_id as get_p,get_products as get_ps
-
+from services.product import ProductService
+from nats_client.client import nats_client
 
 router = APIRouter(prefix="/order",tags=["orders"])
 
+product_service = ProductService(nats_client)
 
 @router.get("/list", response_model=list[OrderOut])
 async def list_orders():
@@ -30,12 +31,12 @@ async def update_order(order_detail:OrderUpdate):
 
 @router.get("/product/{product_id}")
 async def get_product(product_id:str):
-    response = await get_p(product_id=product_id)
+    response = await product_service.get_product_by_id(product_id=product_id)
     return response
 
 @router.get('/products')
 async def get_products(name:str = ""):
-    response = await get_ps(body={"name":name})
+    response = await product_service.get_products(body={"name":name})
     return response
 
 

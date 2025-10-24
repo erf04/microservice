@@ -4,11 +4,12 @@ import (
 	"context"
 	"product/models"
 	"product/repository"
+	"product/schema"
 )
 
 type ProductService interface {
-	GetProductByID(ctx context.Context, id string) (*models.Product, error)
-	GetProducts(ctx context.Context, body models.ProductWriteBody) ([]*models.Product, error)
+	GetProductByID(ctx context.Context, body schema.GetProductByIDSchema) (*models.Product, error)
+	GetProducts(ctx context.Context, body schema.GetProductsSchema) ([]*models.Product, error)
 }
 
 type productService struct {
@@ -19,10 +20,10 @@ func NewProductService(repo repository.ProductRepository) ProductService {
 	return &productService{repo: repo}
 }
 
-func (s *productService) GetProductByID(ctx context.Context, id string) (*models.Product, error) {
-	return s.repo.FindByID(ctx, id)
+func (s *productService) GetProductByID(ctx context.Context, body schema.GetProductByIDSchema) (*models.Product, error) {
+	return s.repo.FindByID(ctx, body.ID)
 }
 
-func (s *productService) GetProducts(ctx context.Context, body models.ProductWriteBody) ([]*models.Product, error) {
+func (s *productService) GetProducts(ctx context.Context, body schema.GetProductsSchema) ([]*models.Product, error) {
 	return s.repo.Find(ctx, body)
 }

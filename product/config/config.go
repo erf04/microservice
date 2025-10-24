@@ -13,6 +13,8 @@ type Config struct {
 	MongoHost string
 	MongoPort string
 	MongoDB  string
+	NatsServer string 
+	NatsPort string
 }
 
 func LoadConfig() *Config {
@@ -28,6 +30,8 @@ func LoadConfig() *Config {
 		MongoHost: getEnv("DB_HOST", "mongodb://localhost:27017"),
 		MongoPort: getEnv("DB_PORT", "mongodb://localhost:27017"),
 		MongoDB:  getEnv("DB_NAME", "products"),
+		NatsServer: getEnv("NATS_SERVER", "nats://localhost"),
+		NatsPort: getEnv("NATS_PORT", "4222"),
 	}
 }
 

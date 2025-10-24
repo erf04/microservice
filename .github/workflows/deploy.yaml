@@ -67,7 +67,7 @@ jobs:
 
       - name: Update Order Deployment
         run: |
-          kubectl set image deployment/order-service order-service=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }} --record
+          kubectl set image deployment/order-service order-service=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }}
           kubectl rollout status deployment/order-service
           echo "✅ Order service updated to version ${{ env.VERSION }}"
 
