@@ -67,6 +67,7 @@ jobs:
 
       - name: Update Order Deployment
         run: |
+          kubectl apply -f deployment/order-service
           kubectl set image deployment/order-service order-service=${{ secrets.ORDER_IMAGE }}:${{ env.VERSION }}
           kubectl rollout status deployment/order-service
           echo "✅ Order service updated to version ${{ env.VERSION }}"
@@ -113,6 +114,7 @@ jobs:
 
       - name: Update Product Deployment
         run: |
+          kubectl apply -f deployment/product-service
           kubectl set image deployment/product-service product-service=${{ secrets.PRODUCT_IMAGE }}:${{ env.VERSION }} --record
           kubectl rollout status deployment/product-service
           echo "✅ Product service updated to version ${{ env.VERSION }}"
