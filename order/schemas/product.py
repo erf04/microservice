@@ -7,3 +7,7 @@ class ProductBase(BaseModel):
     name:str
 
 
+class ProductFilter(BaseModel):
+    price: float | None = None
+    name : str | None = None
+

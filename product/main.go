@@ -39,19 +39,7 @@ func main() {
 	fmt.Println("🚀 Nats server running successfully")
 	// register events
 	natsclient.RegisterRPCHandler("product.getbyid", "product-workers", productHandler.GetProductByID)
-	// grpcServer := grpc.NewServer()
-	// productServer := server.NewProductServer(svc)
+	natsclient.RegisterRPCHandler("product.all","product-workers",productHandler.GetProducts)
+
 	select {}
-	// Register gRPC
-	// pb.RegisterProductServiceServer(grpcServer, productServer)
-
-	// Start server
-	// _, err = net.Listen("tcp", "0.0.0.0:50051")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// if err := grpcServer.Serve(listener); err != nil {
-	// 	log.Fatal(err)
-	// }
 }

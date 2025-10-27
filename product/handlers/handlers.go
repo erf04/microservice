@@ -31,3 +31,17 @@ func (p *ProductHandler) GetProductByID(req []byte) (res []byte, err error) {
 	}
 	return json.Marshal(product)
 }
+
+
+func (p *ProductHandler) GetProducts(req []byte) (res []byte,err error) {
+	var body schema.GetProductsSchema
+	if err:= json.Unmarshal(req,&body);err != nil {
+		return nil,err
+	}
+	ctx := context.Background()
+	products , err := p.service.GetProducts(ctx,body)
+	if err!= nil {
+		return nil,err
+	}
+	return json.Marshal(products)
+}

@@ -1,5 +1,6 @@
 from fastapi.routing import APIRouter
 from schemas.order import OrderCreate,OrderOut,OrderUpdate
+from schemas.product import ProductFilter
 from models.order import OrderModel
 from services.product import ProductService
 from nats_client.client import nats_client
@@ -35,8 +36,8 @@ async def get_product(product_id:str):
     return response
 
 @router.get('/products')
-async def get_products(name:str = ""):
-    response = await product_service.get_products(body={"name":name})
+async def get_products(name : str | None = None , price : int | None = None):
+    response = await product_service.get_products(body={"name":name,"price":price})
     return response
 
 

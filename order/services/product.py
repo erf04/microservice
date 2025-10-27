@@ -1,8 +1,3 @@
-import grpc
-import services.proto.product_pb2 as product_pb2
-import services.proto.product_pb2_grpc as product_pb2_grpc
-import os
-from google.protobuf.json_format import MessageToDict
 from nats_client.client import NatsClient
 from schemas import product
 
@@ -21,8 +16,7 @@ class ProductService:
         
 
 
-    async def get_products(body:dict):
-        channel = grpc.insecure_channel(f"{os.environ.get('PRODUCTSVC')}:50051")
-        stub = product_pb2_grpc.ProductServiceStub(channel=channel)
-        response = stub.GetProducts(product_pb2.GetProductsRequest(**body))
-        return MessageToDict(response, preserving_proto_field_name=True)
+    async def get_products(self,body:dict):
+        products = await self.client.request("product.all",body)
+        return products
+

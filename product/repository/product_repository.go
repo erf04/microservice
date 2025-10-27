@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	"product/logger"
 	"product/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	// "go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-)
-
-import (
 	"product/schema"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ProductRepository interface {
@@ -70,8 +69,10 @@ func (r *productRepository) Find(ctx context.Context, body schema.GetProductsSch
 	// If neither field is provided, return all products
 	products, err := r.collection.Find(ctx, filter)
 	if err != nil {
+		logger.Logger.Fatalln("Error finding products:", err)
 		return nil, err
 	}
+	// logger.Logger.Println("products count" , products.)
 	var productsList []*models.Product
 	for products.Next(ctx) {
 		var p models.Product
@@ -80,5 +81,6 @@ func (r *productRepository) Find(ctx context.Context, body schema.GetProductsSch
 		}
 		productsList = append(productsList, &p)
 	}
+	logger.Logger.Println("product list count" , len(productsList))
 	return productsList, nil
 }
